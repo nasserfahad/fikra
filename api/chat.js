@@ -81,9 +81,24 @@ export default async function handler(req, res) {
       .join("\n")
       .trim();
 
-    // ── Save the Q&A to Supabase (does not block the user's reply) ──
+    // ── Save to Supabase (does not block the user's reply) ──
     if (SUPABASE_URL && SUPABASE_SERVICE_KEY) {
       const lastUser = [...messages].reverse().find((m) => m.role === "user");
+      let question = lastUser?.content || "";
+      const record = { mode, question, answer: text, session_id: sessionId };
+
+      // For a full analysis, store the structured result too. This single JSON
+      // contains everything the app shows: التحليل + الخريطة (mindmap) +
+      // الإنفوجرافيك + الفيديو (script). Saving it captures all four views at once.
+      if (mode === "analysis") {
+        record.question = question.replace(/^حلل هذه الفكرة بعمق:\s*/, "");
+        const parsed = tryParseJSON(text);
+        if (parsed) {
+          record.analysis = parsed;          // the complete structured analysis (jsonb)
+          record.title = parsed.title || null;
+        }
+      }
+
       try {
         await fetch(`${SUPABASE_URL}/rest/v1/conversations`, {
           method: "POST",
@@ -93,12 +108,7 @@ export default async function handler(req, res) {
             Authorization: `Bearer ${SUPABASE_SERVICE_KEY}`,
             Prefer: "return=minimal",
           },
-          body: JSON.stringify({
-            mode,
-            question: lastUser?.content || "",
-            answer: text,
-            session_id: sessionId,
-          }),
+          body: JSON.stringify(record),
         });
       } catch (e) {
         // If logging fails we still return the answer to the user.
@@ -109,5 +119,20 @@ export default async function handler(req, res) {
     return res.status(200).json({ text });
   } catch (err) {
     return res.status(500).json({ error: err.message || "خطأ غير متوقع" });
+  }
+}
+
+// Safely pull a JSON object out of the model's reply. Returns null on failure
+// so a logging hiccup never breaks the user's response.
+function tryParseJSON(text) {
+  try {
+    const clean = String(text)
+      .replace(/```json|```/g, "")
+      .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, "")
+      .trim();
+    const m = clean.match(/\{[\s\S]*\}/);
+    return m ? JSON.parse(m[0]) : null;
+  } catch {
+    return null;
   }
 }
