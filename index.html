@@ -1,0 +1,500 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>منصة فكرة — مستشارك الاستراتيجي الذكي</title>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root{
+      --primary:#00514d; --accent:#1bab75; --accent-dark:#179b68;
+      --bg:#f7f9fa; --card:#ffffff; --border:#e0e0e0;
+      --text:#333333; --text2:#555555; --muted:#666666; --muted2:#777777; --faint:#999999;
+      --gold:#d4a448; --gold-dark:#b8862f; --red:#dc2626;
+      --soft1:#cfe8df; --soft2:#e3f3ec; --pale:#eafaf3;
+    }
+    *{box-sizing:border-box;}
+    ::-webkit-scrollbar{width:6px;height:6px;}
+    ::-webkit-scrollbar-track{background:#eef1f3;}
+    ::-webkit-scrollbar-thumb{background:#cfd8dc;border-radius:4px;}
+    body{
+      margin:0;min-height:100vh;background:var(--bg);
+      font-family:'IBM Plex Sans Arabic','Tajawal',sans-serif;direction:rtl;
+      display:flex;flex-direction:column;color:var(--text);
+    }
+
+    .header{background:var(--card);border-bottom:1px solid var(--border);box-shadow:0 2px 10px rgba(0,0,0,.06);
+      padding:12px 20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+    .brand{display:flex;align-items:center;gap:12px;}
+    .logo-box{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--primary));
+      display:flex;align-items:center;justify-content:center;font-size:18px;}
+    .brand h1{margin:0;color:var(--primary);font-size:18px;font-weight:800;}
+    .brand p{margin:0;color:var(--faint);font-size:11px;}
+    .btn-analyze{background:linear-gradient(135deg,var(--accent),var(--primary));color:#fff;border:none;border-radius:10px;
+      padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;}
+    .btn-analyze:disabled{background:#cdd6da;cursor:not-allowed;}
+
+    .consent{background:var(--bg);border-bottom:1px solid var(--soft1);padding:10px 16px;
+      display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+    .consent span{color:var(--muted);font-size:12px;line-height:1.7;}
+    .consent button{background:var(--accent);color:#fff;border:none;border-radius:8px;padding:7px 18px;
+      font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;flex-shrink:0;}
+
+    .tabs{background:var(--card);border-bottom:1px solid var(--border);padding:0 16px;display:flex;gap:4px;overflow-x:auto;}
+    .tab{background:transparent;border:none;border-bottom:2px solid transparent;color:var(--faint);
+      padding:12px 16px;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;font-family:inherit;transition:all .2s;}
+    .tab.active{border-bottom-color:var(--accent);color:var(--accent);}
+
+    .error{background:#fdecec;border:1px solid #f3c9c9;border-radius:10px;padding:10px 16px;margin:12px 16px;
+      color:var(--red);font-size:13px;display:flex;justify-content:space-between;align-items:center;}
+    .error .x{cursor:pointer;color:var(--muted2);}
+
+    .content{flex:1;overflow:hidden;display:flex;flex-direction:column;}
+    .scroll{flex:1;overflow-y:auto;padding:16px;}
+
+    .chat{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+    .messages{flex:1;overflow-y:auto;padding:16px 16px 8px;}
+    .row{display:flex;margin-bottom:14px;}
+    .row.user{justify-content:flex-start;}
+    .row.bot{justify-content:flex-end;}
+    .bubble{max-width:80%;padding:12px 16px;}
+    .bubble.user{background:var(--card);border:1px solid var(--border);border-radius:16px 4px 16px 16px;color:var(--text2);}
+    .bubble.bot{background:linear-gradient(135deg,var(--soft1),var(--soft2));border:1px solid #1bab7540;
+      border-radius:4px 16px 16px 16px;color:var(--text);}
+    .bubble p{margin:0;font-size:14px;line-height:1.7;white-space:pre-wrap;}
+    .bot-label{color:var(--accent);font-size:11px;font-weight:700;margin-bottom:6px;}
+    .typing{display:flex;gap:4px;}
+    .typing span{width:6px;height:6px;border-radius:50%;background:var(--accent);animation:bounce 1.2s infinite;}
+    .typing span:nth-child(2){animation-delay:.2s;}.typing span:nth-child(3){animation-delay:.4s;}
+    @keyframes bounce{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-6px)}}
+
+    .input-area{padding:8px 16px 16px;background:var(--bg);}
+    .input-box{background:var(--card);border:1px solid var(--border);border-radius:14px;display:flex;gap:8px;
+      padding:8px 12px;align-items:flex-end;}
+    .input-box textarea{flex:1;background:transparent;border:none;outline:none;color:var(--text);font-size:14px;
+      resize:none;max-height:100px;min-height:36px;font-family:inherit;line-height:1.6;}
+    .send-btn{background:var(--accent);border:none;border-radius:8px;width:36px;height:36px;cursor:pointer;
+      font-size:16px;flex-shrink:0;color:#fff;}
+    .send-btn:disabled{opacity:.4;cursor:not-allowed;}
+    .hint{color:var(--faint);font-size:11px;margin:6px 0 0;text-align:center;}
+
+    .empty{text-align:center;padding:48px;color:#aaa;}
+    .empty .ico{font-size:40px;margin-bottom:12px;}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;}
+    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+    .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+    .a-tabs{display:flex;gap:6px;margin-bottom:16px;overflow-x:auto;padding-bottom:4px;}
+    .a-tab{background:var(--card);border:1px solid var(--border);color:var(--muted2);border-radius:8px;
+      padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;font-family:inherit;}
+    .a-tab.active{background:var(--accent);border-color:var(--accent);color:#fff;}
+    .pot{padding:3px 12px;border-radius:20px;font-size:12px;font-weight:700;}
+    .box-green{background:var(--pale);border:1px solid #bfe6d4;border-radius:8px;padding:10px;}
+    .box-red{background:#fdecec;border:1px solid #f3c9c9;border-radius:8px;padding:10px;}
+    .label-g{color:var(--accent);font-size:11px;font-weight:700;}
+    .label-r{color:var(--red);font-size:11px;font-weight:700;}
+
+    .vid-screen{background:#062e2b;border-radius:12px;aspect-ratio:16/9;display:flex;flex-direction:column;
+      align-items:center;justify-content:center;position:relative;overflow:hidden;margin-bottom:12px;}
+    .vid-glow{position:absolute;inset:0;background:radial-gradient(circle at 30% 50%,#1bab7520,transparent 60%),
+      radial-gradient(circle at 70% 50%,#00514d20,transparent 60%);}
+    .vid-controls{display:flex;gap:8px;justify-content:center;margin-bottom:16px;flex-wrap:wrap;}
+    .vbtn{border:none;border-radius:8px;padding:8px 16px;font-size:13px;cursor:pointer;font-family:inherit;font-weight:600;}
+    .thumbs{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;}
+    .thumb{min-width:90px;border-radius:8px;padding:8px 10px;cursor:pointer;flex-shrink:0;}
+
+    @media(max-width:600px){.grid3{grid-template-columns:1fr;}.bubble{max-width:88%;}}
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <div class="brand">
+      <div class="logo-box">💡</div>
+      <div>
+        <h1>منصة فكرة</h1>
+        <p>مستشارك الاستراتيجي الذكي</p>
+      </div>
+    </div>
+    <button class="btn-analyze" id="analyzeBtn" onclick="runAnalysis()">⚡ تحليل شامل</button>
+  </div>
+
+  <div class="consent" id="consent">
+    <span>🔒 نحفظ أسئلتك وإجاباتك لتحسين الخدمة، وقد تُعالَج عبر مزوّد ذكاء اصطناعي خارجي. باستخدامك المنصة فإنك توافق على ذلك.</span>
+    <button onclick="acceptConsent()">موافق</button>
+  </div>
+
+  <div class="tabs" id="tabs"></div>
+
+  <div id="errorBar"></div>
+
+  <div class="content">
+    <div class="chat" id="chatView">
+      <div class="messages" id="messages"></div>
+      <div class="input-area">
+        <div class="input-box">
+          <textarea id="input" rows="1" placeholder="اكتب فكرتك أو اسأل سؤالاً..."></textarea>
+          <button class="send-btn" id="sendBtn" onclick="sendMessage()">➤</button>
+        </div>
+        <p class="hint">Enter للإرسال • Shift+Enter لسطر جديد</p>
+      </div>
+    </div>
+    <div class="scroll" id="panelView" style="display:none;"></div>
+  </div>
+
+<script>
+const TABS = [
+  { id:"chat", label:"المستشار", icon:"💬" },
+  { id:"analysis", label:"التحليل", icon:"📊" },
+  { id:"mindmap", label:"الخريطة", icon:"🧠" },
+  { id:"infographic", label:"إنفوجرافيك", icon:"🎨" },
+  { id:"video", label:"الفيديو", icon:"🎬" },
+];
+const ANALYSIS_TABS = [
+  { key:"summary", label:"ملخص", icon:"💡" },
+  { key:"market", label:"السوق", icon:"📊" },
+  { key:"competitors", label:"المنافسون", icon:"⚔️" },
+  { key:"opportunities", label:"الفرص", icon:"🚀" },
+  { key:"risks", label:"المخاطر", icon:"⚠️" },
+  { key:"plan", label:"الخطة", icon:"📋" },
+];
+const MM_COLORS = ["#00514d","#1bab75","#d4a448","#dc2626","#0f8a5f"];
+const SESSION_ID = Math.random().toString(36).slice(2) + Date.now().toString(36);
+
+const state = {
+  tab: "chat",
+  aTab: "summary",
+  messages: [{ role:"assistant", content:"أهلاً! أنا فكرة — مستشارك الاستراتيجي.\n\nأخبرني عن الفكرة التي تريد تطويرها، وسأساعدك في بنائها خطوة بخطوة. 🚀" }],
+  chatLoading: false,
+  analysisLoading: false,
+  data: null,
+  video: { scene:0, progress:0, playing:false, timer:null },
+};
+
+function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+const $ = id => document.getElementById(id);
+
+async function callAI(messages, mode){
+  const res = await fetch("/api/chat", {
+    method:"POST", headers:{ "Content-Type":"application/json" },
+    body: JSON.stringify({ messages, mode, sessionId: SESSION_ID }),
+  });
+  if(!res.ok){ const e = await res.json().catch(()=>({})); throw new Error(e.error || ("HTTP "+res.status)); }
+  const data = await res.json();
+  return data.text || "";
+}
+function parseJSON(text){
+  const clean = text.replace(/```json|```/g,"").replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g,"").trim();
+  const m = clean.match(/\{[\s\S]*\}/);
+  if(!m) throw new Error("لا يوجد JSON في الرد");
+  try { return JSON.parse(m[0]); } catch(e){ throw new Error("JSON غير مكتمل — حاول مرة أخرى"); }
+}
+function showError(msg){
+  $("errorBar").innerHTML = msg ?
+    '<div class="error">' + esc(msg) + ' <span class="x" onclick="showError(\'\')">✕</span></div>' : "";
+}
+
+function acceptConsent(){ try{ localStorage.setItem("fikra_consent","1"); }catch(e){} $("consent").style.display="none"; }
+
+function renderTabs(){
+  $("tabs").innerHTML = TABS.map(t =>
+    '<button class="tab '+(state.tab===t.id?"active":"")+'" onclick="switchTab(\''+t.id+'\')">'+t.icon+' '+t.label+'</button>'
+  ).join("");
+}
+function switchTab(id){
+  state.tab = id;
+  renderTabs();
+  const isChat = id === "chat";
+  $("chatView").style.display = isChat ? "flex" : "none";
+  $("panelView").style.display = isChat ? "none" : "block";
+  if(!isChat) renderPanel();
+}
+function renderPanel(){
+  if(state.tab==="analysis") renderAnalysis();
+  else if(state.tab==="mindmap") renderMindmap();
+  else if(state.tab==="infographic") renderInfographic();
+  else if(state.tab==="video") renderVideo();
+}
+
+function renderMessages(){
+  let html = state.messages.map(m =>
+    '<div class="row '+(m.role==="user"?"user":"bot")+'">'+
+      '<div class="bubble '+(m.role==="user"?"user":"bot")+'">'+
+        (m.role!=="user" ? '<div class="bot-label">💡 فكرة</div>' : "")+
+        '<p>'+esc(m.content)+'</p>'+
+      '</div></div>').join("");
+  if(state.chatLoading){
+    html += '<div class="row bot"><div class="bubble bot"><div class="typing"><span></span><span></span><span></span></div></div></div>';
+  }
+  const box = $("messages");
+  box.innerHTML = html;
+  box.scrollTop = box.scrollHeight;
+}
+async function sendMessage(){
+  const input = $("input");
+  const text = input.value.trim();
+  if(!text || state.chatLoading) return;
+  state.messages.push({ role:"user", content:text });
+  input.value = "";
+  state.chatLoading = true;
+  showError("");
+  renderMessages(); updateSendBtn();
+  try {
+    const apiMessages = state.messages
+      .filter((m,i) => m.role!=="assistant" || i>0)
+      .map(m => ({ role:m.role, content:m.content }));
+    const reply = await callAI(apiMessages, "chat");
+    state.messages.push({ role:"assistant", content:reply });
+  } catch(e){ showError(e.message); }
+  finally { state.chatLoading = false; renderMessages(); updateSendBtn(); }
+}
+function updateSendBtn(){ $("sendBtn").disabled = state.chatLoading || !$("input").value.trim(); }
+
+async function runAnalysis(){
+  const ideaText = state.messages.filter(m=>m.role==="user").map(m=>m.content).join(" ");
+  if(!ideaText.trim()){ showError("تحدث مع المستشار أولاً لتحديد الفكرة"); return; }
+  state.analysisLoading = true;
+  $("analyzeBtn").disabled = true;
+  $("analyzeBtn").textContent = "🔍 جاري التحليل...";
+  showError("");
+  try {
+    const text = await callAI([{ role:"user", content:"حلل هذه الفكرة بعمق: " + ideaText.slice(0,600) }], "analysis");
+    state.data = parseJSON(text);
+    switchTab("analysis");
+  } catch(e){ showError("خطأ في التحليل: " + e.message); }
+  finally {
+    state.analysisLoading = false;
+    $("analyzeBtn").disabled = false;
+    $("analyzeBtn").textContent = "⚡ تحليل شامل";
+  }
+}
+function potBadge(level, label){
+  const c = { high:["#e6f7ef","#1bab75","#1bab75"], medium:["#faf3e2","#d4a448","#b8862f"], low:["#fdeaea","#dc2626","#dc2626"] }[level] || ["#faf3e2","#d4a448","#b8862f"];
+  return '<span class="pot" style="background:'+c[0]+';color:'+c[1]+';border:1px solid '+c[2]+'">'+esc(label||"")+'</span>';
+}
+function renderAnalysis(){
+  const d = state.data;
+  if(!d){ $("panelView").innerHTML = emptyHtml("ابدأ التحليل أولاً — اضغط ⚡ تحليل شامل"); return; }
+  const tabsHtml = '<div class="a-tabs">'+ANALYSIS_TABS.map(t =>
+    '<button class="a-tab '+(state.aTab===t.key?"active":"")+'" onclick="switchATab(\''+t.key+'\')">'+t.icon+' '+t.label+'</button>').join("")+'</div>';
+  $("panelView").innerHTML = tabsHtml + '<div id="aBody"></div>';
+  renderABody();
+}
+function switchATab(key){ state.aTab = key; renderAnalysis(); }
+function renderABody(){
+  const d = state.data, t = state.aTab;
+  let h = "";
+  if(t==="summary"){
+    h = '<div class="card">'+
+      '<div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:14px">'+
+        '<span style="color:var(--muted)">'+esc(d.summary&&d.summary.type)+'</span>'+potBadge(d.summary&&d.summary.potential, d.summary&&d.summary.potentialLabel)+
+      '</div>'+
+      '<p style="color:var(--text2);line-height:1.8;margin:0">'+esc(d.summary&&d.summary.description)+'</p>'+
+      '<div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border)">'+
+        '<p style="color:var(--muted);font-size:12px;margin:0 0 8px">🇸🇦 رؤية 2030</p>'+
+        '<p style="color:var(--primary);margin:0">'+esc(d.market&&d.market.saudiContext)+'</p>'+
+      '</div></div>';
+  } else if(t==="market"){
+    const cells = [["📏 حجم السوق",d.market&&d.market.size],["📈 الاتجاه",d.market&&d.market.trend],["🎯 الجمهور",d.market&&d.market.targetAudience]]
+      .map(p=>'<div class="card" style="padding:14px"><p style="color:var(--muted);font-size:11px;margin:0 0 4px">'+p[0]+'</p><p style="color:var(--text);margin:0;font-weight:600">'+esc(p[1])+'</p></div>').join("");
+    const ins = ((d.market&&d.market.insights)||[]).map(x=>'<p style="color:var(--text2);margin:0 0 6px;font-size:13px">← '+esc(x)+'</p>').join("");
+    h = '<div style="display:grid;gap:12px"><div class="grid3">'+cells+'</div>'+
+      '<div class="card"><p style="color:var(--muted);font-size:12px;margin:0 0 10px">💎 الرؤى</p>'+ins+'</div></div>';
+  } else if(t==="competitors"){
+    h = '<div style="display:grid;gap:10px">' + ((d.competitors)||[]).map(c=>
+      '<div class="card">'+
+        '<div style="display:flex;justify-content:space-between;margin-bottom:10px">'+
+          '<span style="color:var(--text);font-weight:700">'+esc(c.name)+'</span>'+
+          '<span style="color:var(--muted);font-size:11px;background:var(--bg);padding:2px 10px;border-radius:10px">'+esc(c.type)+'</span>'+
+        '</div>'+
+        '<div class="grid2">'+
+          '<div class="box-green"><p class="label-g" style="margin:0 0 4px">✅ قوة</p><p style="color:#0f8a5f;margin:0;font-size:12px">'+esc(c.strength)+'</p></div>'+
+          '<div class="box-red"><p class="label-r" style="margin:0 0 4px">❌ ضعف</p><p style="color:var(--red);margin:0;font-size:12px">'+esc(c.weakness)+'</p></div>'+
+        '</div></div>').join("") + '</div>';
+  } else if(t==="opportunities"){
+    h = '<div style="display:grid;gap:10px">' + ((d.opportunities)||[]).map(o=>
+      '<div class="card" style="border-right:3px solid '+(o.priority==="high"?"#1bab75":"#d4a448")+'">'+
+        '<div style="display:flex;justify-content:space-between;margin-bottom:6px">'+
+          '<span style="color:var(--text);font-weight:700">'+esc(o.title)+'</span>'+
+          '<span style="color:var(--accent);font-weight:700;font-size:13px">'+esc(o.revenue)+'</span>'+
+        '</div>'+
+        '<p style="color:var(--muted);margin:0;font-size:13px">'+esc(o.description)+'</p></div>').join("") + '</div>';
+  } else if(t==="risks"){
+    h = '<div style="display:grid;gap:10px">' + ((d.risks)||[]).map(r=>
+      '<div class="card">'+
+        '<div style="display:flex;justify-content:space-between;margin-bottom:8px">'+
+          '<span style="color:var(--text);font-weight:700">'+esc(r.title)+'</span>'+
+          '<span style="background:'+(r.level==="high"?"#fef2f2":"#fffbeb")+';color:'+(r.level==="high"?"#dc2626":"#d97706")+';padding:2px 10px;border-radius:10px;font-size:11px;font-weight:700">'+(r.level==="high"?"مرتفع":"متوسط")+'</span>'+
+        '</div>'+
+        '<p style="color:var(--muted);font-size:13px;margin:0 0 8px">'+esc(r.description)+'</p>'+
+        '<div style="background:var(--bg);border-radius:8px;padding:8px"><span style="color:var(--accent);font-size:11px;font-weight:700">🛡️ </span><span style="color:var(--primary);font-size:12px">'+esc(r.mitigation)+'</span></div></div>').join("") + '</div>';
+  } else if(t==="plan"){
+    const phases = [d.plan&&d.plan.phase1,d.plan&&d.plan.phase2,d.plan&&d.plan.phase3].filter(Boolean).map((p,i)=>
+      '<div class="card">'+
+        '<div style="display:flex;gap:10px;margin-bottom:12px">'+
+          '<div style="width:28px;height:28px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:13px;flex-shrink:0">'+(i+1)+'</div>'+
+          '<span style="color:var(--text);font-weight:700;padding-top:4px">'+esc(p.title)+'</span>'+
+        '</div>'+
+        ((p.steps)||[]).map(s=>'<p style="color:var(--text2);font-size:13px;margin:0 0 6px">▸ '+esc(s)+'</p>').join("")+'</div>').join("");
+    const kpis = ((d.plan&&d.plan.kpis)||[]).map(k=>'<div style="background:var(--bg);border-radius:8px;padding:8px 12px;color:var(--primary);font-size:13px;margin-bottom:6px">'+esc(k)+'</div>').join("");
+    h = '<div style="display:grid;gap:12px">'+phases+'<div class="card" style="border-color:var(--accent)"><p style="color:var(--primary);font-weight:700;margin:0 0 10px">📌 مؤشرات الأداء</p>'+kpis+'</div></div>';
+  }
+  $("aBody").innerHTML = h;
+}
+
+function renderMindmap(){
+  const m = state.data && state.data.mindmap;
+  if(!m){ $("panelView").innerHTML = emptyHtml("ابدأ التحليل أولاً لتوليد الخريطة الذهنية"); return; }
+  const branches = m.branches||[], R=160, r=85, W=700, H=500, cx=W/2, cy=H/2;
+  let defs = MM_COLORS.map((c,i)=>'<radialGradient id="g'+i+'" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="'+c+'" stop-opacity="0.18"/><stop offset="100%" stop-color="'+c+'" stop-opacity="0.04"/></radialGradient>').join("");
+  let svg = '<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;max-width:'+W+'px;display:block;margin:0 auto"><defs>'+defs+'</defs>';
+  svg += '<circle cx="'+cx+'" cy="'+cy+'" r="52" fill="#00514d" opacity="0.95"/>';
+  svg += '<text x="'+cx+'" y="'+(cy-6)+'" text-anchor="middle" fill="#fff" font-size="13" font-weight="700" font-family="IBM Plex Sans Arabic">'+esc((m.center||"").slice(0,10))+'</text>';
+  svg += '<text x="'+cx+'" y="'+(cy+12)+'" text-anchor="middle" fill="#cfe8df" font-size="11" font-family="IBM Plex Sans Arabic">'+esc((m.center||"").slice(10,20))+'</text>';
+  branches.forEach((b,i)=>{
+    const a = (i/branches.length)*Math.PI*2 - Math.PI/2;
+    const bx = cx+Math.cos(a)*R, by = cy+Math.sin(a)*R, color = MM_COLORS[i%MM_COLORS.length];
+    svg += '<line x1="'+cx+'" y1="'+cy+'" x2="'+bx+'" y2="'+by+'" stroke="'+color+'" stroke-width="2" stroke-opacity="0.45" stroke-dasharray="4,3"/>';
+    svg += '<circle cx="'+bx+'" cy="'+by+'" r="36" fill="url(#g'+i+')" stroke="'+color+'" stroke-width="1.5"/>';
+    svg += '<text x="'+bx+'" y="'+(by+4)+'" text-anchor="middle" fill="'+color+'" font-size="11" font-weight="700" font-family="IBM Plex Sans Arabic">'+esc(b.label)+'</text>';
+    (b.children||[]).forEach((ch,j)=>{
+      const ca = a + (j-(((b.children.length)-1)/2))*0.55;
+      const dx = bx+Math.cos(ca)*r, dy = by+Math.sin(ca)*r;
+      svg += '<line x1="'+bx+'" y1="'+by+'" x2="'+dx+'" y2="'+dy+'" stroke="'+color+'" stroke-width="1" stroke-opacity="0.3"/>';
+      svg += '<rect x="'+(dx-38)+'" y="'+(dy-12)+'" width="76" height="24" rx="12" fill="#ffffff" stroke="'+color+'" stroke-width="1" stroke-opacity="0.6"/>';
+      svg += '<text x="'+dx+'" y="'+(dy+4)+'" text-anchor="middle" fill="#555555" font-size="9.5" font-family="IBM Plex Sans Arabic">'+esc((ch||"").slice(0,14))+'</text>';
+    });
+  });
+  svg += '</svg>';
+  $("panelView").innerHTML = '<div style="overflow-x:auto;padding:16px">'+svg+'</div>';
+}
+
+function renderInfographic(){
+  const d = state.data;
+  if(!d){ $("panelView").innerHTML = emptyHtml("ابدأ التحليل أولاً لتوليد الإنفوجرافيك"); return; }
+  const potColor = (d.summary&&d.summary.potential)==="high"?"#1bab75":(d.summary&&d.summary.potential)==="medium"?"#d4a448":"#dc2626";
+  const stats = [["📏 حجم السوق",d.market&&d.market.size,"#1bab75"],["📈 الاتجاه",d.market&&d.market.trend,"#00514d"],["🎯 الجمهور",d.market&&d.market.targetAudience,"#d4a448"]]
+    .map(p=>'<div style="background:var(--bg);border-radius:14px;padding:14px 12px;text-align:center;border:1px solid '+p[2]+'30">'+
+      '<div style="font-size:18px;margin-bottom:4px">'+p[0].split(" ")[0]+'</div>'+
+      '<div style="color:'+p[2]+';font-size:11px;font-weight:700;margin-bottom:4px">'+p[0].slice(2)+'</div>'+
+      '<div style="color:var(--text);font-size:12px">'+esc(p[1])+'</div></div>').join("");
+  const lvls = ["low","medium","high"];
+  const pot = d.summary&&d.summary.potential;
+  const bars = lvls.map(l=>{
+    const on = pot===l || (l==="medium"&&pot==="high") || (l==="low"&&(pot==="medium"||pot==="high"));
+    return '<div style="width:32px;height:10px;border-radius:5px;background:'+(on?potColor:"#e0e0e0")+'"></div>';
+  }).join("");
+  const ops = ((d.opportunities)||[]).slice(0,2).map(o=>'<div style="color:#0f8a5f;font-size:11px;margin-bottom:6px;padding-right:8px;border-right:2px solid #1bab75">'+esc(o.title)+'</div>').join("");
+  const rks = ((d.risks)||[]).slice(0,2).map(r=>'<div style="color:var(--red);font-size:11px;margin-bottom:6px;padding-right:8px;border-right:2px solid #dc2626">'+esc(r.title)+'</div>').join("");
+  const phases = [d.plan&&d.plan.phase1,d.plan&&d.plan.phase2,d.plan&&d.plan.phase3].filter(Boolean).map(p=>
+    '<div style="text-align:center"><div style="background:var(--accent);border-radius:8px;padding:4px 8px;font-size:10px;color:#fff;margin-bottom:6px">'+esc(p.title)+'</div>'+
+    ((p.steps)||[]).slice(0,2).map(s=>'<div style="color:var(--muted);font-size:10px;margin-bottom:3px">• '+esc((s||"").slice(0,20))+'</div>').join("")+'</div>').join("");
+
+  $("panelView").innerHTML = '<div style="padding:8px">'+
+    '<div id="infographic-export" style="background:#fff;border-radius:20px;padding:28px;border:1px solid var(--soft1)">'+
+      '<div style="text-align:center;margin-bottom:24px">'+
+        '<div style="display:inline-block;background:var(--accent);border-radius:12px;padding:4px 20px;margin-bottom:10px"><span style="color:#eafaf3;font-size:11px;letter-spacing:2px">تحليل استراتيجي</span></div>'+
+        '<h2 style="color:var(--primary);margin:0;font-size:22px;font-weight:800">'+esc(d.title)+'</h2>'+
+        '<p style="color:var(--muted2);margin:6px auto 0;font-size:13px">'+esc(d.summary&&d.summary.type)+'</p>'+
+      '</div>'+
+      '<div class="grid3" style="margin-bottom:20px">'+stats+'</div>'+
+      '<div style="background:var(--bg);border-radius:14px;padding:16px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;border:1px solid '+potColor+'40">'+
+        '<span style="color:var(--muted);font-size:13px">إمكانية النجاح</span>'+
+        '<div style="display:flex;gap:8px;align-items:center">'+bars+'<span style="color:'+potColor+';font-weight:700;font-size:14px">'+esc(d.summary&&d.summary.potentialLabel)+'</span></div>'+
+      '</div>'+
+      '<div class="grid2" style="margin-bottom:16px">'+
+        '<div class="box-green" style="padding:14px"><div class="label-g" style="margin-bottom:10px">🚀 الفرص</div>'+ops+'</div>'+
+        '<div class="box-red" style="padding:14px"><div class="label-r" style="margin-bottom:10px">⚠️ المخاطر</div>'+rks+'</div>'+
+      '</div>'+
+      '<div style="background:var(--bg);border-radius:14px;padding:14px;border:1px solid var(--soft1)">'+
+        '<div style="color:var(--primary);font-size:12px;font-weight:700;margin-bottom:12px">📋 خارطة الطريق</div>'+
+        '<div class="grid3" style="gap:8px">'+phases+'</div>'+
+      '</div>'+
+      '<div style="text-align:center;margin-top:16px;color:#aaa;font-size:10px">تم التحليل بواسطة منصة فكرة • مدعوم بالذكاء الاصطناعي</div>'+
+    '</div>'+
+    '<button onclick="exportInfographic()" style="margin:12px 0 0 auto;display:block;background:var(--accent);color:#fff;border:none;border-radius:10px;padding:10px 24px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">🖨️ طباعة / تصدير</button>'+
+  '</div>';
+}
+function exportInfographic(){
+  const el = $("infographic-export");
+  if(!el) return;
+  const w = window.open("","_blank");
+  w.document.write('<html dir="rtl"><head><meta charset="utf-8"><style>body{margin:0;background:#f7f9fa;font-family:\'IBM Plex Sans Arabic\',sans-serif}</style></head><body>'+el.outerHTML+'</body></html>');
+  w.document.close(); w.print();
+}
+
+function renderVideo(){
+  const sc = state.data && state.data.script;
+  if(!sc){ $("panelView").innerHTML = emptyHtml("ابدأ التحليل أولاً لتوليد السكريبت والستوريبورد"); return; }
+  const rows = [["🎣 الخطاف",sc.hook,"#d4a448"],["❓ المشكلة",sc.problem,"#dc2626"],["💡 الحل",sc.solution,"#1bab75"],["✅ الدليل",sc.proof,"#00514d"],["📣 الدعوة",sc.cta,"#d4a448"]]
+    .map(p=>'<div style="display:flex;gap:12px;align-items:flex-start"><span style="color:'+p[2]+';font-weight:700;font-size:13px;min-width:80px;padding-top:2px">'+p[0]+'</span><p style="color:var(--muted);margin:0;font-size:13px;line-height:1.6;flex:1">'+esc(p[1])+'</p></div>').join("");
+  $("panelView").innerHTML = '<div style="display:grid;gap:20px">'+
+    '<div class="card" style="border-radius:16px;padding:20px"><h3 style="color:var(--text);margin:0 0 16px;font-size:16px">📝 السكريبت</h3><div style="display:grid;gap:10px">'+rows+'</div></div>'+
+    '<div class="card" style="border-radius:16px;padding:20px">'+
+      '<h3 style="color:var(--text);margin:0 0 16px;font-size:16px">🎬 معاينة الستوريبورد</h3>'+
+      '<div class="vid-screen"><div class="vid-glow"></div>'+
+        '<div style="text-align:center;padding:24px;position:relative;z-index:1">'+
+          '<div id="vScene" style="color:var(--accent);font-size:12px;margin-bottom:12px;letter-spacing:2px"></div>'+
+          '<p id="vText" style="color:#fff;font-size:16px;font-weight:700;margin:0 0 12px;line-height:1.5"></p>'+
+          '<p id="vVisual" style="color:#a7c4bb;font-size:12px;margin:0;font-style:italic"></p>'+
+        '</div>'+
+        '<div style="position:absolute;bottom:0;left:0;right:0;height:3px;background:#e0e0e0"><div id="vBar" style="height:100%;background:var(--accent);transition:width .1s linear;width:0%"></div></div>'+
+      '</div>'+
+      '<div class="vid-controls">'+
+        '<button class="vbtn" style="background:var(--border);color:var(--muted)" onclick="vidReset()">⏮ إعادة</button>'+
+        '<button class="vbtn" style="background:var(--border);color:var(--muted)" onclick="vidStep(-1)">⏪</button>'+
+        '<button class="vbtn" id="vPlay" style="background:var(--accent);color:#fff" onclick="vidToggle()">▶️ تشغيل</button>'+
+        '<button class="vbtn" style="background:var(--border);color:var(--muted)" onclick="vidStep(1)">⏩</button>'+
+      '</div>'+
+      '<div class="thumbs" id="vThumbs"></div>'+
+    '</div></div>';
+  state.video.scene = 0; state.video.progress = 0; state.video.playing = false;
+  vidPaint();
+}
+function storyboard(){ return (state.data && state.data.script && state.data.script.storyboard) || []; }
+function vidPaint(){
+  const sb = storyboard(), s = sb[state.video.scene] || sb[0] || {};
+  if($("vScene")) $("vScene").textContent = "المشهد " + (s.scene||1) + " / " + sb.length;
+  if($("vText")) $("vText").textContent = s.text || "";
+  if($("vVisual")) $("vVisual").textContent = "📷 " + (s.visual || "");
+  if($("vBar")) $("vBar").style.width = state.video.progress + "%";
+  if($("vPlay")) $("vPlay").textContent = state.video.playing ? "⏸ إيقاف" : "▶️ تشغيل";
+  if($("vThumbs")) $("vThumbs").innerHTML = sb.map((sx,i)=>{
+    const on = state.video.scene===i;
+    return '<div class="thumb" style="background:'+(on?"var(--accent)":"var(--bg)")+';border:1px solid '+(on?"var(--accent)":"var(--border)")+'" onclick="vidGo('+i+')">'+
+      '<div style="color:'+(on?"#eafaf3":"var(--muted)")+';font-size:10px;margin-bottom:4px">مشهد '+sx.scene+'</div>'+
+      '<div style="color:'+(on?"#fff":"var(--faint)")+';font-size:10px;line-height:1.4">'+esc((sx.text||"").slice(0,30))+'...</div></div>';
+  }).join("");
+}
+function vidClear(){ if(state.video.timer){ clearInterval(state.video.timer); state.video.timer = null; } }
+function vidToggle(){ state.video.playing ? vidPause() : vidPlay(); }
+function vidPlay(){
+  const sb = storyboard(); if(!sb.length) return;
+  state.video.playing = true; vidPaint();
+  vidClear();
+  state.video.timer = setInterval(()=>{
+    const dur = ((sb[state.video.scene] && sb[state.video.scene].duration) || 3)*1000;
+    state.video.progress += 100/(dur/100);
+    if(state.video.progress >= 100){
+      if(state.video.scene < sb.length-1){ state.video.scene++; state.video.progress = 0; }
+      else { state.video.progress = 100; state.video.playing = false; vidClear(); }
+    }
+    vidPaint();
+  }, 100);
+}
+function vidPause(){ state.video.playing = false; vidClear(); vidPaint(); }
+function vidReset(){ vidClear(); state.video.scene = 0; state.video.progress = 0; state.video.playing = false; vidPaint(); }
+function vidStep(dir){ const sb = storyboard(); vidClear(); state.video.playing=false; state.video.scene = Math.min(sb.length-1, Math.max(0, state.video.scene+dir)); state.video.progress = 0; vidPaint(); }
+function vidGo(i){ vidClear(); state.video.playing=false; state.video.scene = i; state.video.progress = 0; vidPaint(); }
+
+function emptyHtml(text){ return '<div class="empty"><div class="ico">✨</div><p style="margin:0;font-size:14px">'+esc(text)+'</p></div>'; }
+
+try{ if(localStorage.getItem("fikra_consent")==="1") $("consent").style.display="none"; }catch(e){}
+const inputEl = $("input");
+inputEl.addEventListener("input", updateSendBtn);
+inputEl.addEventListener("keydown", e => { if(e.key==="Enter" && !e.shiftKey){ e.preventDefault(); sendMessage(); } });
+renderTabs();
+renderMessages();
+updateSendBtn();
+</script>
+</body>
+</html>
